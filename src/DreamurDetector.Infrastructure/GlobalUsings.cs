@@ -1,0 +1,10 @@
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Logging;
+global using Microsoft.Extensions.Options;
+global using DreamurDetector.Domain;
+global using DreamurDetector.Domain.Entities;
+global using DreamurDetector.Application.Common;
+global using DreamurDetector.Application.Dtos;
+global using DreamurDetector.Application.Interfaces;
+global using DreamurDetector.Application.Options;
+global using DreamurDetector.Infrastructure.Persistence;

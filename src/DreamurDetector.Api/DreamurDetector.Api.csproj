@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <!-- "dotnet publish -c Release -o ./dist" escribe dentro del proyecto: que una segunda compilación no lo trate como contenido. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);dist/**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DreamurDetector.Domain\DreamurDetector.Domain.csproj" />
+    <ProjectReference Include="..\DreamurDetector.Application\DreamurDetector.Application.csproj" />
+    <ProjectReference Include="..\DreamurDetector.Infrastructure\DreamurDetector.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.*" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\DreamurDetector.Domain\DreamurDetector.Domain.csproj" />
+  </ItemGroup>
+</Project>

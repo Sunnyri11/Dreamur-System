@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DreamurDetector.Domain/DreamurDetector.Domain.csproj" />
+    <Project Path="src/DreamurDetector.Application/DreamurDetector.Application.csproj" />
+    <Project Path="src/DreamurDetector.Infrastructure/DreamurDetector.Infrastructure.csproj" />
+    <Project Path="src/DreamurDetector.Api/DreamurDetector.Api.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,49 @@
+# Blueprint de Render: https://render.com/docs/blueprint-spec
+# Los valores con sync:false se piden en el panel la primera vez (nunca los subas al repositorio).
+services:
+  - type: web
+    name: dreamur-detector-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL            # URI de Neon: postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require
+        sync: false
+      - key: Jwt__Key                # mínimo 32 caracteres
+        generateValue: true
+      - key: Jwt__ExpiraMinutos
+        value: "240"                 # 4 horas
+      # CORS: público (cualquier página puede llamar a la API). No hace falta configurar nada.
+      - key: App__FrontendUrl        # URL del frontend: los enlaces de los correos apuntan aquí
+        sync: false
+      - key: App__PublicApiUrl       # https://dreamur-detector-api.onrender.com
+        sync: false
+      - key: Seed__AdminCorreo
+        sync: false
+      - key: Seed__AdminPassword
+        sync: false
+      - key: Storage__Provider
+        value: S3
+      - key: Storage__ServiceUrl     # R2: https://<account>.r2.cloudflarestorage.com
+        sync: false
+      - key: Storage__AccessKey
+        sync: false
+      - key: Storage__SecretKey
+        sync: false
+      - key: Storage__Bucket
+        sync: false
+      - key: Auth__RequerirCorreoVerificado   # el paciente confirma su cuenta con el correo de Brevo
+        value: "true"
+      - key: Email__BrevoApiKey      # Brevo → SMTP & API → API Keys (xkeysib-...)
+        sync: false
+      - key: Email__Remitente        # remitente VERIFICADO en Brevo (Senders, Domains & Dedicated IPs)
+        sync: false
+      - key: Email__RemitenteNombre
+        value: Dreamur-Detector
+      - key: Detector__BaseUrl       # IA de Dreamur-Detector en Oracle Cloud, p. ej. http://IP_PUBLICA:8001
+        sync: false
+      - key: Detector__ApiKey
+        sync: false
+      - key: Detector__CallbackApiKey
+        generateValue: true
