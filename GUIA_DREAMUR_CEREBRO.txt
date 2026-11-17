@@ -1,0 +1,278 @@
+=====================================================================
+ DREAMUR-DETECTOR · TUMORES CEREBRALES · GUÍA COMPLETA (servicio de IA)
+ Qué instalar, en qué orden y qué hacer en cada paso
+=====================================================================
+Archivos de documentación en este zip:
+   GUIA_DREAMUR_CEREBRO.txt       (este archivo)
+   DATASETS.md                    datasets cerebrales, links y cómo usar cada uno
+   COMPARACION_HERRAMIENTAS.md    por qué se usó o descartó cada herramienta
+
+
+0. QUÉ HACE Y CÓMO ENCAJA
+---------------------------------------------------------------------
+  Paciente sube un estudio cerebral -> BACKEND (aún no existe):
+     1) guarda el ORIGINAL en Cloudflare R2: imagen (jpg/png/webp/bmp/
+        tiff), DICOM (.dcm), NIfTI (.nii/.nii.gz) o .zip con la serie
+        DICOM. Aplica a resonancia (MRI) y tomografía (TC).
+     2) crea las filas en Neon: estudios + estudio_archivos
+     3) llama al servicio de IA:
+           POST https://<servicio-ia>.onrender.com/analizar
+           Cabecera: X-API-Key: <ML_API_KEY>
+           Cuerpo:   {"estudio_id": "<uuid>", "solicitado_por": "<uuid usuario>"}
+
+  El servicio de IA (este zip, va a Render como servicio APARTE):
+     - Lee el estudio del bucket (hasta 12 cortes si es un volumen).
+     - CNN (ResNet, PyTorch) + red neuronal + XGBoost -> tipo de tumor
+       (glioma, meningioma, pituitario, metástasis, sin tumor),
+       naturaleza (benigno/maligno), grado (bajo/alto) y grado OMS
+       (I-IV), cada uno solo si el modelo pudo aprenderlo.
+     - Grad-CAM -> zonas dibujadas sobre la imagen (se guarda en R2) y
+       su área (indicador de tamaño).
+     - HISTORIAL: compara con los estudios anteriores del mismo
+       paciente (misma modalidad) y con sus eventos clínicos (cirugía,
+       quimio, radioterapia...) -> progresión / estable / reducción, y
+       una proyección simple del área a 90 días.
+     - Gemma 3 redacta la explicación y las recomendaciones (opcional).
+     - Guarda todo en Neon (detecciones, zonas, evolución, auditoría).
+
+  Un modelo por MODALIDAD: "mri" y "tc". (Para TC no hay dataset
+  público de tumores que pueda recomendarte: ver DATASETS.md.)
+
+  Dónde vive cada cosa:
+     Neon (PostgreSQL) -> memoria de Dreamur: datos, etiquetas, versiones
+                          de modelo, resultados, historial
+     Cloudflare R2     -> estudios originales, overlays y PESOS de modelos
+     Render            -> solo ejecuta el código (disco efímero)
+     Tu PC / Colab     -> aquí se ENTRENA (en Render sería lentísimo)
+
+  "Qué tan avanzado está": los tumores cerebrales no usan estadios TNM.
+  Se informa el GRADO (bajo/alto y OMS I-IV), el tamaño (área marcada)
+  y su cambio en el tiempo.
+
+
+1. BASE DE DATOS (Neon) · sql/001_schema.sql
+---------------------------------------------------------------------
+  Personas y acceso: personas, correos_electronicos, usuarios,
+     tokens_verificacion, pacientes, medicos, administradores,
+     consentimientos (el consentimiento 'uso_entrenamiento' decide si
+     los estudios de un paciente alimentan el aprendizaje).
+  Historial clínico: eventos_clinicos (cirugía, quimioterapia,
+     radioterapia, inmunoterapia, medicación, síntoma...).
+  Catálogos: tipos_tumor, dataset_fuentes (licencia y cita de cada
+     dataset).
+  Estudios: estudios (modalidad mri|tc, secuencia, fecha, paciente),
+     estudio_archivos (varios archivos por estudio; formato
+     imagen|dicom|nifti|zip; storage_key del bucket; corte_clave).
+  Memoria de Dreamur-Detector: modelo_versiones (pesos en el bucket,
+     métricas, versión activa), entrenamientos, modelo_progresion.
+  Resultados: detecciones (tipo, malignidad, grado, grado OMS,
+     confianza, probabilidades, área, informe, evolución),
+     detecciones_zonas (rectángulos 0-1), etiquetas (diagnóstico
+     confirmado: lo único que alimenta el aprendizaje).
+  Sistema: configuracion, auditoria.
+  Vistas: v_consentimiento_vigente, v_muestras_entrenables.
+  Es una base NUEVA: crea una base o rama nueva en Neon. Las
+  imágenes y pesos NO van en Neon (solo su ruta), así no se
+  sobreexplota.
+
+
+2. QUÉ HAY QUE INSTALAR (TODO)
+---------------------------------------------------------------------
+ 2.1 Programas / cuentas
+   [ ] Python 3.11 (64 bits)  https://www.python.org/downloads/
+         (Render usa 3.11.9). En Windows marca "Add to PATH".
+   [ ] Git                    https://git-scm.com/downloads
+   [ ] VS Code (opcional)     https://code.visualstudio.com/
+   [ ] Driver NVIDIA al día   SOLO si entrenas con GPU NVIDIA.
+   [ ] Cuentas: Neon, Cloudflare R2, Render, Kaggle (token en
+         Settings -> API), Synapse (solo para BraTS), TCIA (solo para
+         UCSF-PDGM/UPENN-GBM), Google AI Studio para la clave de Gemma
+         (opcional): https://aistudio.google.com/apikey
+
+ 2.2 Paquetes de Python
+   Servicio (requirements.txt):
+     fastapi, uvicorn, python-multipart, pydantic   API web
+     boto3                                          Cloudflare R2
+     psycopg[binary]                                Neon (PostgreSQL)
+     xgboost, scikit-learn, scipy, numpy, pillow    ML e imágenes
+     python-dotenv                                  leer el .env
+     pydicom                                        leer DICOM
+     nibabel                                        leer NIfTI
+   Aparte: torch y torchvision (PyTorch) -> paso 3.3
+   Solo en tu PC (requirements-train.txt): kagglehub, pylibjpeg
+     (DICOM comprimidos), h5py (convertir el dataset de Cheng), pytest.
+   Grad-CAM está dentro del proyecto: no hace falta pytorch-grad-cam
+   ni OpenCV.
+
+
+3. PASO A PASO EN TU PC
+---------------------------------------------------------------------
+ 3.1 Entorno virtual (dentro de la carpeta del proyecto)
+     Windows:  py -3.11 -m venv .venv  &&  .venv\Scripts\Activate.ps1
+     Linux/Mac: python3.11 -m venv .venv && source .venv/bin/activate
+     python -m pip install --upgrade pip
+
+ 3.2 Neon: crea una BASE o RAMA NUEVA y copia su cadena de conexión.
+
+ 3.3 PyTorch (elige UNA)
+     CPU:  pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+     GPU NVIDIA: copia el comando de https://pytorch.org/get-started/locally/
+        (ej.: pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121)
+
+ 3.4 Resto de paquetes
+     pip install -r requirements-train.txt
+     Comprobar: python -c "import torch, xgboost, fastapi, boto3, psycopg, pydicom, nibabel; print('OK', torch.cuda.is_available())"
+     Pruebas sin red ni BD:  pytest -q
+
+ 3.5 Archivo .env  (copia .env.example a .env)
+     DATABASE_URL, ML_API_KEY (clave larga aleatoria: la MISMA que
+     usará el backend; genérala con
+     python -c "import secrets; print(secrets.token_urlsafe(48))"),
+     S3_ENDPOINT (https://<account_id>.r2.cloudflarestorage.com, sin el
+     nombre del bucket), S3_REGION=auto, S3_BUCKET, S3_ACCESS_KEY_ID,
+     S3_SECRET_ACCESS_KEY, y opcional GEMMA_API_KEY.
+     El .env NUNCA se sube a Git (está en .gitignore).
+
+ 3.6 Crear tablas y catálogos en Neon
+     python -m scripts.init_db
+     (aplica sql/001_schema.sql, siembra tipos de tumor y fuentes de
+     datasets; se puede repetir sin problema)
+
+ 3.7 Cargar datasets (ver DATASETS.md con links y comandos)
+     python -m scripts.ingest --adaptador brain_kaggle --root "D:/datos/brain-tumor-mri-dataset"
+     Prueba rápida antes de subir todo: añade --limite 200.
+     Es reanudable (omite lo ya subido). Cheng, BraTS, UCSF-PDGM,
+     UPENN-GBM y LUMIERE se cargan con un manifiesto CSV.
+
+ 3.8 Entrenar
+     python -m scripts.train --modalidad mri --epochs 8
+     Entrena CNN + red neuronal multi-cabeza, XGBoost, elige la mezcla
+     en validación, evalúa en PRUEBA, sube los pesos a R2 y crea una
+     versión (solo se activa si no es peor que la activa).
+     Primera vez: usa --epochs 2 con --limite 200 en la carga, para
+     comprobar que todo funciona.
+
+ 3.9 Comparación con números reales
+     python -m scripts.comparar        -> COMPARACION_RESULTADOS.md
+     Mira F1 macro, recall por clase y AUC de malignidad, no solo el
+     accuracy.
+
+ 3.10 Modelo de progresión (cuando tengas seguimientos)
+     Necesita estudios seriados con fecha, por paciente, y etiqueta de
+     progresión o de grado/malignidad confirmados (LUMIERE o tus
+     pacientes revisados por un médico):
+        python -m scripts.train_progresion
+     Mientras no exista, la API usa reglas (y lo indica en
+     "metodo": "reglas").
+
+ 3.11 Probar en local
+     uvicorn app.main:app --reload --port 8000
+     Documentación interactiva: http://localhost:8000/docs
+     Prueba rápida sin guardar (cualquier formato):
+        curl -X POST http://localhost:8000/predecir -H "X-API-Key: TU_CLAVE" \
+             -F "archivo=@estudio.dcm" -F "modalidad=mri"
+
+
+4. LO QUE EL BACKEND DEBERÁ HACER (cuando lo desarrolles)
+---------------------------------------------------------------------
+   a) Subida: aceptar jpg/png/webp/bmp/tiff, .dcm, .nii/.nii.gz y .zip
+      (hasta MAX_MB_ESTUDIO, por defecto 200 MB). Guardar el ORIGINAL
+      en R2, p. ej. estudios/pacientes/<paciente_id>/<estudio_id>/<uuid>.<ext>
+   b) Insertar en Neon:
+        estudios (paciente_id, subida_por, origen='paciente',
+                  modalidad 'mri'|'tc', secuencia opcional, fecha_estudio)
+        estudio_archivos (estudio_id, orden, formato in
+                  imagen|dicom|nifti|zip, nombre_original, storage_key,
+                  sha256, tam_bytes)
+      Varios archivos en un mismo estudio = varios cortes o un volumen.
+   c) Llamar a POST /analizar y mostrar: tipo, malignidad, grado,
+      grado OMS, zonas (x,y,ancho,alto normalizados 0-1), overlay_url,
+      informe y evolución.
+   d) Historial: guardar en eventos_clinicos las cirugías, quimio,
+      radioterapia, etc. (mejora la lectura de la evolución) y mostrar
+      GET /historial/<paciente_id>
+   e) Revisión médica: cuando un médico confirma el diagnóstico,
+      escribir en etiquetas (fuente='revision_medica', con grado,
+      grado_oms y 'progresion' si corresponde). Solo los pacientes con
+      consentimiento 'uso_entrenamiento' alimentan el aprendizaje.
+   f) El servicio de IA NO verifica quién es el usuario: el backend
+      debe comprobar que el usuario puede ver ese estudio/paciente.
+
+   Endpoints (todos con X-API-Key salvo /health):
+      GET  /health            estado
+      GET  /modelos           modelos activos, formatos aceptados
+      GET  /catalogo          tipos de tumor conocidos
+      POST /predecir          prueba con un archivo (no guarda)
+      POST /analizar          flujo real con estudio_id (guarda, usa historial)
+      GET  /historial/{id}    línea de tiempo + evolución del paciente
+      POST /entrenar          reentrenar (desactivado en Render)
+      GET  /entrenar/estado   últimos entrenamientos
+
+
+5. PUBLICAR EN RENDER (servicio de IA separado del backend)
+---------------------------------------------------------------------
+   a) Sube la carpeta a GitHub (sin .env ni cache).
+   b) Render -> New -> Blueprint (usa render.yaml) o Web Service con
+      Build: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu && pip install -r requirements.txt
+      Start: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+      Health check: /health
+   c) Pega las variables del .env en Environment. Deja
+      ALLOW_RETRAIN_ENDPOINT=0.
+   d) Memoria: PyTorch + XGBoost + volúmenes consumen RAM. render.yaml
+      pide el plan "standard"; si usas uno menor y se reinicia por falta
+      de memoria (OOM), sube de plan o baja MAX_CORTES.
+   e) Los pesos NO van en el repositorio: se bajan de R2 y se comprueba
+      cada 60 s si hay versión nueva activa.
+
+
+6. SEGURIDAD Y PRIVACIDAD
+---------------------------------------------------------------------
+   * Las claves de Neon y R2 se pegaron en un chat: considéralas
+     expuestas. Rota la contraseña de Neon y crea un token nuevo de R2
+     (borra el anterior) antes de publicar; los valores nuevos solo en
+     tu .env y en Render.
+   * Nunca subas .env a Git. Bucket R2 PRIVADO (se entregan URL firmadas).
+   * Son datos de salud: pide consentimiento y cumple la normativa de tu
+     país. De DICOM el servicio descarta nombre/documento (solo lee
+     fecha de estudio y modalidad), pero el archivo original guardado en
+     R2 SÍ contiene la cabecera completa: protégelo.
+   * Los datasets públicos tienen licencias y condiciones propias:
+     respétalas y cítalos (la tabla dataset_fuentes las registra).
+
+
+7. LIMITACIONES (LÉELAS)
+---------------------------------------------------------------------
+   * Es una herramienta de APOYO. No sustituye al médico ni a la biopsia.
+   * Benigno/maligno y grado por imagen son probabilidades. Solo se
+     aprenden donde hay datasets con esa etiqueta REAL (ver DATASETS.md).
+     Para glioma, meningioma y pituitario el dataset de Kaggle no trae
+     malignidad por caso: el informe usa el conocimiento general del
+     tipo y lo marca como tal.
+   * Sin dataset de TC cerebral con tumores no habrá modelo de TC.
+   * Predicción a futuro: con reglas es una señal de alerta y una
+     proyección matemática simple; un pronóstico aprendido exige
+     seguimientos etiquetados.
+   * El área de las zonas (Grad-CAM) no es una medición del tumor.
+   * Las métricas con datasets públicos son optimistas (sin ID de
+     paciente, pocos centros). Valida con casos de tu hospital.
+   * ESTADO DE ESTA ENTREGA: el esquema SQL se probó en PostgreSQL real
+     y pasan las pruebas de lectores (imagen/ZIP), historial, adaptadores
+     de datasets y zonas (pytest). El código de PyTorch/XGBoost
+     (entrenamiento, modelo), las llamadas a R2/Neon y la lectura real
+     de DICOM/NIfTI NO se pudieron ejecutar donde se escribió (sin
+     PyTorch ni red). Espera corregir algún detalle en la primera
+     ejecución con datos reales: empieza con --limite 200 y --epochs 2.
+
+
+8. PROBLEMAS FRECUENTES
+---------------------------------------------------------------------
+   "Falta la variable de entorno X"   -> revisa el .env / Render.
+   "No hay un modelo activo"          -> entrena esa modalidad (3.8).
+   "Etiquetas inválidas" al ingerir   -> el manifiesto usa un tipo,
+        malignidad, grado o grado_oms fuera de app/taxonomy.py.
+   Archivo DICOM no se lee            -> pip install pylibjpeg
+        pylibjpeg-libjpeg (DICOM comprimidos).
+   Error de credenciales en R2        -> S3_ENDPOINT sin el bucket al final.
+   Entrenamiento "en_curso" atascado  -> se libera solo a las 6 h, o:
+        UPDATE entrenamientos SET estado='error' WHERE estado='en_curso';
+=====================================================================

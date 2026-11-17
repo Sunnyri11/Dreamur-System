@@ -1,0 +1,15 @@
+# PyTorch/torchvision se instalan aparte (ver render.yaml y la guía): versión CPU en Render.
+fastapi
+uvicorn
+python-multipart
+pydantic
+boto3
+psycopg[binary]
+xgboost
+scikit-learn
+scipy
+numpy
+pillow
+python-dotenv
+pydicom        # leer DICOM (.dcm y series en .zip)
+nibabel        # leer NIfTI (.nii / .nii.gz)

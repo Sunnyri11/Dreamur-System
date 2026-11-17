@@ -1,0 +1,7 @@
+# Extra solo para tu PC / Colab (entrenar y cargar datasets). NO se instala en Render.
+-r requirements.txt
+kagglehub          # bajar datasets de Kaggle desde Python
+pylibjpeg          # opcional: DICOM comprimidos (JPEG)
+pylibjpeg-libjpeg
+h5py               # solo para convertir el dataset de Cheng (.mat)
+pytest

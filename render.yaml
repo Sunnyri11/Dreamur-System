@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: dreamur-detector-ia
+    runtime: python
+    plan: standard          # PyTorch + XGBoost + volúmenes necesitan memoria; Starter suele quedarse corto
+    buildCommand: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu && pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.6
+      - key: DATABASE_URL
+        sync: false
+      - key: ML_API_KEY
+        sync: false
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_REGION
+        value: auto
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: GEMMA_API_KEY      # opcional: sin ella se usa la plantilla de texto
+        sync: false
+      - key: GEMMA_MODEL
+        value: gemma-3-27b-it
+      - key: BACKBONE
+        value: resnet18
+      - key: MAX_CORTES
+        value: "12"
+      - key: MAX_MB_ESTUDIO
+        value: "200"
+      - key: CACHE_DIR
+        value: /tmp/dreamur-cache
+      - key: ALLOW_RETRAIN_ENDPOINT
+        value: "0"             # entrena en tu PC; activa "1" solo si quieres reentrenar desde Render
