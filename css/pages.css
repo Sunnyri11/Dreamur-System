@@ -1,0 +1,72 @@
+/* ───── Detalles específicos de páginas ───── */
+.bienvenida { display: flex; align-items: center; gap: 1.1rem; padding: 1.1rem 1.3rem; border-radius: var(--r-panel); border: 1px solid var(--linea); background: linear-gradient(100deg, rgba(63, 124, 255, .2), rgba(90, 215, 255, .05) 60%, transparent); }
+.bienvenida img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px var(--linea-fuerte), var(--glow-holo); flex: none; }
+.bienvenida h2 { font-family: var(--fuente-display); font-size: 1.15rem; font-weight: 600; }
+.bienvenida p { margin: .25rem 0 0; color: var(--tinta-2); font-size: var(--t-sm); }
+
+.lista-simple { display: grid; gap: .5rem; margin: 0; padding: 0; list-style: none; }
+.lista-simple li { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: .65rem .8rem; border-radius: 10px; background: rgba(90, 215, 255, .04); border: 1px solid var(--linea); font-size: var(--t-sm); }
+.lista-simple li.click { cursor: pointer; }
+.lista-simple li.click:hover { border-color: var(--linea-fuerte); background: rgba(90, 215, 255, .08); }
+
+.paciente-cab { display: flex; gap: 1.1rem; align-items: center; flex-wrap: wrap; }
+.paciente-cab .avatar { width: 58px; height: 58px; font-size: 1.1rem; }
+.paciente-cab h1 { font-size: 1.3rem; }
+.paciente-cab .meta { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .4rem; align-items: center; }
+
+.consent-fila { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .8rem 0; border-bottom: 1px solid var(--linea); }
+.consent-fila:last-child { border-bottom: 0; }
+.consent-fila p { margin: 0; font-size: var(--t-sm); color: var(--tinta-2); }
+.consent-fila b { font-weight: 500; display: block; color: var(--tinta); }
+
+.interruptor-sw { position: relative; width: 44px; height: 24px; flex: none; }
+.interruptor-sw input { position: absolute; inset: 0; opacity: 0; cursor: pointer; margin: 0; z-index: 1; }
+.interruptor-sw span { position: absolute; inset: 0; border-radius: 24px; background: var(--casco-3); border: 1px solid var(--linea); transition: background .2s; }
+.interruptor-sw span::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--tinta-2); transition: transform .2s var(--ease), background .2s; }
+.interruptor-sw input:checked + span { background: rgba(90, 215, 255, .3); border-color: var(--holo); }
+.interruptor-sw input:checked + span::after { transform: translateX(20px); background: var(--holo); }
+.interruptor-sw input:focus-visible + span { outline: 2px solid var(--holo); outline-offset: 2px; }
+
+.filtros { display: flex; gap: .7rem; flex-wrap: wrap; align-items: end; }
+.filtros .field { min-width: 150px; }
+.filtros .buscar { flex: 1; min-width: 220px; }
+
+.auditoria-det { max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--tinta-3); font-size: var(--t-xs); }
+
+@media print { .sidebar, .topbar, .page-actions { display: none !important; } body { background: #fff; color: #000; } }
+
+/* ───── Visor con zonas: el lienzo se ajusta al tamaño real de la imagen para que las zonas coincidan ───── */
+.visor { display: grid; place-items: center; min-height: 160px; }
+.visor .lienzo { position: relative; display: block; width: fit-content; max-width: 100%; line-height: 0; }
+.visor .lienzo > img { display: block; width: auto; height: auto; max-width: 100%; max-height: min(68vh, 560px); object-fit: contain; }
+.visor .lienzo .zonas { position: absolute; inset: 0; }
+.zona.borde span { top: auto; bottom: -22px; border-radius: 0 4px 4px 4px; }
+.estudio .visor { display: block; }
+.estudio .visor > img { width: 100%; height: 100%; }
+
+/* ───── Cabecera con avatar grande (ficha del paciente) ───── */
+.persona.grande { gap: 1rem; }
+.persona.grande .avatar { width: 56px; height: 56px; font-size: 1.15rem; }
+.persona.grande h1 { margin: 0; }
+.persona.grande p { margin: .2rem 0 0; color: var(--tinta-2); }
+
+/* ───── Ajustes tras las pruebas en navegador ───── */
+.oculto { display: none !important; }
+.paso svg { width: 14px; height: 14px; flex: none; }
+.tabla .num, .tabla td.nowrap { white-space: nowrap; }
+
+/* ───── Móvil: nada debe ensanchar la página; las tablas se desplazan dentro de su caja ───── */
+.content { min-width: 0; max-width: 100%; }
+.content > *, .grid > *, .card, .card-head > * { min-width: 0; }
+.page-head { flex-wrap: wrap; }
+.card-head { flex-wrap: wrap; gap: .7rem; }
+.tabs .tab { flex: none; }
+@media (max-width: 640px) {
+  .page-actions { width: 100%; }
+  .page-actions .btn { flex: 1 1 auto; justify-content: center; }
+  .card-head .field { min-width: 0 !important; width: 100%; }
+}
+
+/* Selector de perfil (usuarios con varios roles) */
+.cambio-rol{display:flex;align-items:center;gap:.4rem;font-size:.75rem;color:var(--texto-suave,#8a97b5)}
+.cambio-rol select{padding:.3rem .5rem;min-width:8rem}

@@ -1,0 +1,68 @@
+/* Dreamur-Detector · tokens de diseño.
+   Dirección: laboratorio de neuro-diagnóstico, azul profundo con holograma cian.
+   El rosa «lesión» se reserva para hallazgos; el verde «vital» para lo válido. */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Unbounded:wght@500;600;700&display=swap');
+
+:root {
+  /* superficies */
+  --abismo: #050c1d;
+  --casco: #0b1a38;
+  --casco-2: #112650;
+  --casco-3: #17305f;
+  --vidrio: rgba(11, 26, 56, .72);
+  --linea: rgba(90, 215, 255, .16);
+  --linea-fuerte: rgba(90, 215, 255, .38);
+
+  /* tinta */
+  --tinta: #e8f1ff;
+  --tinta-2: #a4b8d9;
+  --tinta-3: #7088ae;
+
+  /* acentos de interfaz */
+  --holo: #5ad7ff;
+  --holo-hover: #8be3ff;
+  --cobalto: #3f7cff;
+  --lesion: #ff6f9c;
+  --vital: #44efc2;
+  --alerta: #ffc45c;
+  --violeta: #a78bfa;
+
+  /* fondos suaves para badges */
+  --holo-bg: rgba(90, 215, 255, .12);
+  --lesion-bg: rgba(255, 111, 156, .14);
+  --vital-bg: rgba(68, 239, 194, .12);
+  --alerta-bg: rgba(255, 196, 92, .14);
+  --neutro-bg: rgba(164, 184, 217, .12);
+
+  /* marcas de gráficas (validadas contra --casco: banda L, croma, CVD y contraste) */
+  --viz-cian: #00a3d6;
+  --viz-rosa: #db6686;
+  --viz-ambar: #c78200;
+  --viz-violeta: #9a7de3;
+  --viz-menta: #00ae84;
+  --viz-azul: #4c94ec;
+
+  /* tipografía */
+  --fuente-display: 'Unbounded', 'Segoe UI', system-ui, sans-serif;
+  --fuente: 'IBM Plex Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  /* escala */
+  --t-xs: .78rem;
+  --t-sm: .875rem;
+  --t-md: 1rem;
+  --t-lg: 1.2rem;
+  --t-xl: 1.55rem;
+  --t-2xl: 2.1rem;
+
+  /* forma: radios distintos según jerarquía */
+  --r-panel: 16px;
+  --r-ctrl: 10px;
+  --r-chip: 999px;
+  --r-visor: 6px;
+
+  --sombra-glow: 0 0 0 1px var(--linea), 0 12px 40px -16px rgba(0, 0, 0, .7);
+  --glow-holo: 0 0 22px rgba(90, 215, 255, .35);
+  --ancho-sidebar: 252px;
+  --alto-topbar: 64px;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}

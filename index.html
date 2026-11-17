@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Iniciar sesión · Dreamur-Detector</title>
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+<div class="auth">
+    <aside class="auth-hero">
+      <img src="assets/img/raco.jpg" alt="">
+      <div class="marca"><img src="assets/img/raco-face.jpg" alt="">Dreamur-Detector</div>
+      <h2>Neuro-oncología asistida por inteligencia artificial</h2>
+      <p>Sube tus resonancias, sigue cómo evolucionan y comparte los resultados con tu médico.</p>
+      <div class="capacidades"><span class="badge info">Análisis con IA</span><span class="badge ok">Seguimiento de evolución</span><span class="badge violeta">Informes en PDF</span></div>
+    </aside>
+    <main class="auth-panel"><div class="auth-card">
+      <div><h1>Iniciar sesión</h1><p class="sub">Accede a tu panel de paciente, médico o administrador.</p></div>
+      <div id="aviso"></div>
+      <form id="form" class="stack" novalidate>
+        <div class="field"><label for="correo" class="req">Correo electrónico</label>
+          <input class="input" id="correo" name="correo" type="email" autocomplete="username" required autofocus placeholder="tu@correo.com"></div>
+        <div class="field"><label for="password" class="req">Contraseña</label>
+          <input class="input" id="password" name="password" type="password" autocomplete="current-password" required></div>
+        <button class="btn btn-primario btn-bloque" type="submit">Entrar</button>
+        <div class="auth-links"><a href="olvide.html">Olvidé mi contraseña</a><a href="registro.html">Crear cuenta de paciente</a></div>
+      </form>
+      <span class="estado-api" id="estadoApi"><span class="punto wait" id="puntoApi"></span><span id="textoApi">Comprobando servidor…</span></span>
+      <p class="auth-pie">Los médicos reciben su cuenta del administrador. Resultados orientativos: no sustituyen la valoración médica.</p>
+    </div></main>
+  </div>
+  <noscript><p style="padding:2rem">Dreamur-Detector necesita JavaScript para funcionar.</p></noscript>
+  <script type="module" src="js/pages/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Crear cuenta · Dreamur-Detector</title>
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+<div class="auth">
+    <aside class="auth-hero">
+      <img src="assets/img/raco.jpg" alt="">
+      <div class="marca"><img src="assets/img/raco-face.jpg" alt="">Dreamur-Detector</div>
+      <h2>Crea tu cuenta de paciente</h2>
+      <p>Sube tus estudios cerebrales, obtén un análisis orientativo y sigue tu evolución en el tiempo.</p>
+      <div class="capacidades"><span class="badge info">Análisis con IA</span><span class="badge ok">Seguimiento de evolución</span><span class="badge violeta">Informes en PDF</span></div>
+    </aside>
+    <main class="auth-panel"><div class="auth-card ancha">
+      <div><h1>Crear cuenta de paciente</h1><p class="sub">¿Eres médico? Pide tu acceso al administrador.</p></div>
+      <form id="form" class="stack" novalidate>
+        <div class="form-grid">
+          <div class="field"><label for="nombres" class="req">Nombres</label><input class="input" id="nombres" name="nombres" required maxlength="100" minlength="2" autocomplete="given-name"></div>
+          <div class="field"><label for="apellidos" class="req">Apellidos</label><input class="input" id="apellidos" name="apellidos" required maxlength="100" minlength="2" autocomplete="family-name"></div>
+          <div class="field full"><label for="correo" class="req">Correo electrónico</label><input class="input" id="correo" name="correo" type="email" required maxlength="254" autocomplete="email"></div>
+          <div class="field"><label for="password" class="req">Contraseña</label><input class="input" id="password" name="password" type="password" required autocomplete="new-password">
+            <div class="pw-fuerza" aria-hidden="true"><i></i></div><span class="hint">8 o más caracteres, con mayúscula, minúscula y número.</span></div>
+          <div class="field"><label for="repite" class="req">Repite la contraseña</label><input class="input" id="repite" type="password" required autocomplete="new-password"></div>
+          <div class="field"><label for="tipoDocumento">Tipo de documento</label><select class="select" id="tipoDocumento" name="tipoDocumento"><option value="">Sin indicar</option><option value="CI">Cédula de identidad</option><option value="DNI">DNI</option><option value="PASAPORTE">Pasaporte</option><option value="OTRO">Otro</option></select></div>
+          <div class="field"><label for="numeroDocumento">Número de documento</label><input class="input" id="numeroDocumento" name="numeroDocumento" maxlength="30" autocomplete="off"></div>
+          <div class="field"><label for="fechaNacimiento">Fecha de nacimiento</label><input class="input" id="fechaNacimiento" name="fechaNacimiento" type="date" min="1901-01-01"></div>
+          <div class="field"><label for="sexo">Sexo</label><select class="select" id="sexo" name="sexo"><option value="">Sin indicar</option><option value="F">Femenino</option><option value="M">Masculino</option><option value="otro">Otro</option><option value="no_indica">Prefiero no indicar</option></select></div>
+          <div class="field full"><label for="telefono">Teléfono</label><input class="input" id="telefono" name="telefono" type="tel" maxlength="30" autocomplete="tel"></div>
+        </div>
+        <label class="check"><input type="checkbox" id="aceptaTratamientoDatos" name="aceptaTratamientoDatos" required><span>Acepto el tratamiento de mis datos personales y de salud para recibir el servicio. <b>(obligatorio)</b></span></label>
+        <label class="check"><input type="checkbox" id="aceptaUsoEntrenamiento" name="aceptaUsoEntrenamiento"><span>Permito que mis imágenes confirmadas por un médico ayuden a mejorar la IA. (opcional, puedes cambiarlo después)</span></label>
+        <button class="btn btn-primario btn-bloque" type="submit">Crear cuenta</button>
+        <div class="auth-links"><span>¿Ya tienes cuenta?</span><a href="index.html">Iniciar sesión</a></div>
+      </form>
+    </div></main>
+  </div>
+  <noscript><p style="padding:2rem">Dreamur-Detector necesita JavaScript para funcionar.</p></noscript>
+  <script type="module" src="js/pages/registro.js"></script>
+</body>
+</html>

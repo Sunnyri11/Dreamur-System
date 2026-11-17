@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Recuperar contraseña · Dreamur-Detector</title>
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+<div class="auth">
+    <aside class="auth-hero">
+      <img src="assets/img/raco.jpg" alt="">
+      <div class="marca"><img src="assets/img/raco-face.jpg" alt="">Dreamur-Detector</div>
+      <h2>¿Olvidaste tu contraseña?</h2>
+      <p>Te enviaremos un enlace para elegir una nueva. Es válido por tiempo limitado.</p>
+      <div class="capacidades"><span class="badge info">Análisis con IA</span><span class="badge ok">Seguimiento de evolución</span><span class="badge violeta">Informes en PDF</span></div>
+    </aside>
+    <main class="auth-panel"><div class="auth-card">
+      <div><h1>Recuperar contraseña</h1><p class="sub">Escribe el correo con el que te registraste.</p></div>
+      <form id="form" class="stack" novalidate>
+        <div class="field"><label for="correo" class="req">Correo electrónico</label><input class="input" id="correo" name="correo" type="email" required autocomplete="email" autofocus></div>
+        <button class="btn btn-primario btn-bloque" type="submit">Enviar enlace</button>
+        <div class="auth-links"><a href="index.html">Volver a iniciar sesión</a></div>
+      </form>
+    </div></main>
+  </div>
+  <noscript><p style="padding:2rem">Dreamur-Detector necesita JavaScript para funcionar.</p></noscript>
+  <script type="module" src="js/pages/olvide.js"></script>
+</body>
+</html>
