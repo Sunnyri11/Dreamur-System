@@ -13,6 +13,8 @@ import { visor, activarVisor } from './visor.js';
 import { panelResultado, panelAnalizando, marcoVisor } from './resultado.js';
 import { informeEstudio, descargarInforme } from './informe.js';
 import { opciones } from './forms.js';
+import { campoModelo3D, activarModelo3D } from './modelo3d.js';
+
 
 /**
  * @param {object} rx RadiografiaDto (se vuelve a pedir para tener lo último)
@@ -86,8 +88,9 @@ export async function abrirEstudio(rx, { usuario, paciente = null, alCambiar = (
         <ul class="lista-simple" style="margin-top:.5rem">${previos.map((d) => `<li><span>${esc(fecha(d.createdAt, { hora: true }))}</span>
           <span>${d.imagenValida === false ? 'No válida' : `${esc(nombreTumor(d.tipoTumor, d.tipoTumorNombre))} · ${pct(d.confianza)}`}</span></li>`).join('')}</ul></details>` : '';
 
-    m.body.innerHTML = `<div class="grid g-2" style="align-items:start">${izquierda}<div class="stack">${resultado}${confirmacion}${hist}</div></div>`;
+    m.body.innerHTML = `<div class="grid g-2" style="align-items:start">${izquierda}<div class="stack">${resultado}${campoModelo3D(det)}${confirmacion}${hist}</div></div>`;
     activarVisor(m.body);
+    activarModelo3D(m.body, det);
 
     const form = m.body.querySelector('#et-form');
     if (form) {
