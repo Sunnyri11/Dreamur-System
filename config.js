@@ -16,8 +16,9 @@ const ENTORNOS = {
     IA_URL:  'http://localhost:8001',   // servicio de Dreamur-Detector (modelo)
   },
   render: {
-    API_URL: 'http://localhost:5000',   
+    API_URL: 'ENTRYPOINT ["dotnet", "DreamurDetector.Api.dll"]',   
     IA_URL:  'https://dreamur-detector.duckdns.org',
+    IA_MODEL: 'https://dreamur-generate.duckdns.org',
   },
 };
 
