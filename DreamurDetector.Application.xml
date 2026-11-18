@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DreamurDetector.Application</name>
+    </assembly>
+    <members>
+        <member name="T:DreamurDetector.Application.Dtos.CompletarEntrenamientoRequest">
+            <summary>Callback que envía el servicio ML al terminar un entrenamiento.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Dtos.RegistroRequest.AceptaTratamientoDatos">
+            <summary>Obligatorio: consentimiento de tratamiento de datos.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Dtos.RegistroRequest.AceptaUsoEntrenamiento">
+            <summary>Opcional: permite usar sus imágenes etiquetadas para reentrenar el modelo.</summary>
+        </member>
+        <member name="T:DreamurDetector.Application.Dtos.GenerarModelo3DRequest">
+            <summary>Todos los campos son opcionales: sin cuerpo se genera con los valores por defecto.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Dtos.GenerarModelo3DRequest.Regenerar">
+            <summary>true = descarta el modelo vigente de la detección y genera otro (p. ej. tras corregir el plano).</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Dtos.GenerarModelo3DRequest.Plano">
+            <summary>"auto" detecta el corte (axial/coronal/sagital) a partir de la imagen; los demás valores lo fuerzan.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Dtos.GenerarModelo3DRequest.Vasos">
+            <summary>Red de vasos decorativa hacia el tumor.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Dtos.PacienteFiltro.Buscar">
+            <summary>Busca por nombre, código (PAC-...) o documento.</summary>
+        </member>
+        <member name="T:DreamurDetector.Application.Dtos.ActualizarPacienteRequest">
+            <summary>Actualización parcial: solo se modifican los campos enviados.</summary>
+        </member>
+        <member name="T:DreamurDetector.Application.Dtos.CrearPacienteMedicoRequest">
+            <summary>Alta de un paciente por parte de un médico (queda vinculado a ese médico).</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Dtos.CrearPacienteMedicoRequest.ConfirmaConsentimientoDatos">
+            <summary>Debe ser true: el médico confirma que el paciente aceptó el tratamiento de sus datos.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Dtos.VincularPacienteRequest.Codigo">
+            <summary>Código PAC-xxxxxx o número de documento del paciente.</summary>
+        </member>
+        <member name="T:DreamurDetector.Application.Dtos.PerfilDto">
+            <summary>Perfil completo del usuario autenticado. Los campos de otros roles vienen null.</summary>
+        </member>
+        <member name="M:DreamurDetector.Application.Dtos.PerfilDto.#ctor(System.Guid,System.Guid,System.String,System.Boolean,System.Nullable{System.DateTimeOffset},System.DateTimeOffset,System.String,System.String,System.String,System.String,System.Nullable{System.DateOnly},System.String,System.String,System.String,System.String,System.String,System.String,System.Boolean,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>Perfil completo del usuario autenticado. Los campos de otros roles vienen null.</summary>
+        </member>
+        <member name="T:DreamurDetector.Application.Dtos.ActualizarPerfilRequest">
+            <summary>Actualización parcial: null = no cambia; cadena vacía = borrar el valor. Los campos de otro rol se ignoran.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Dtos.RadiografiaFiltro.PacienteId">
+            <summary>Solo personal médico/admin; un paciente siempre ve únicamente las suyas.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Dtos.SubirRadiografiaRequest.PacienteId">
+            <summary>Requerido cuando sube personal médico/admin (no dataset).</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Dtos.SubirRadiografiaRequest.EsDataset">
+            <summary>Solo admin: carga la imagen al dataset inicial (sin paciente).</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Dtos.SubirRadiografiaRequest.TipoTumorDataset">
+            <summary>Solo dataset: código de tipo de tumor para crear la etiqueta inicial.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Interfaces.IPasswordHasher.DummyHash">
+            <summary>Hash válido pero inventado, para igualar tiempos cuando el usuario no existe.</summary>
+        </member>
+        <member name="M:DreamurDetector.Application.Interfaces.ISesionValidator.EsValidaAsync(System.Guid,System.String,System.Threading.CancellationToken)">
+            <summary>true si el usuario sigue activo y el jti no fue revocado (logout).</summary>
+        </member>
+        <member name="M:DreamurDetector.Application.Interfaces.IAuthService.RegistrarAsync(DreamurDetector.Application.Dtos.RegistroRequest,System.Threading.CancellationToken)">
+            <summary>Devuelve null cuando se exige confirmar el correo: no se abre sesión hasta confirmarlo.</summary>
+        </member>
+        <member name="M:DreamurDetector.Application.Interfaces.IAuthService.CambiarRolAsync(DreamurDetector.Application.Dtos.CambiarRolRequest,System.Threading.CancellationToken)">
+            <summary>Cambia el rol activo (solo entre los perfiles que la persona tiene). Emite un token nuevo y revoca el actual.</summary>
+        </member>
+        <member name="M:DreamurDetector.Application.Interfaces.IAuthService.ActivarRolAsync(DreamurDetector.Application.Dtos.ActivarRolRequest,System.Threading.CancellationToken)">
+            <summary>Activa un perfil adicional: paciente (médico/admin) o médico (admin). Un paciente nunca puede ser médico/admin.</summary>
+        </member>
+        <member name="M:DreamurDetector.Application.Interfaces.IAuthService.ReenviarVerificacionPublicaAsync(DreamurDetector.Application.Dtos.ReenviarVerificacionRequest,System.Threading.CancellationToken)">
+            <summary>Reenvío sin sesión (para quien aún no puede iniciarla). No revela si el correo existe.</summary>
+        </member>
+        <member name="T:DreamurDetector.Application.Interfaces.GeneradorSolicitud">
+            <summary>Lo que se envía a Dreamur-Generate_Model: tipo, zonas de la detección y, si cabe, la imagen original.</summary>
+        </member>
+        <member name="M:DreamurDetector.Application.Interfaces.GeneradorSolicitud.#ctor(System.String,System.Collections.Generic.IReadOnlyList{DreamurDetector.Application.Interfaces.DetectorZona},System.String,System.String,System.Boolean,System.Byte[])">
+            <summary>Lo que se envía a Dreamur-Generate_Model: tipo, zonas de la detección y, si cabe, la imagen original.</summary>
+        </member>
+        <member name="T:DreamurDetector.Application.Interfaces.IGeneradorClient">
+            <summary>Cliente HTTP del servicio Dreamur-Generate_Model (POST /generar).</summary>
+        </member>
+        <member name="M:DreamurDetector.Application.Interfaces.IModelo3DService.GenerarAsync(System.Guid,DreamurDetector.Application.Dtos.GenerarModelo3DRequest,System.Threading.CancellationToken)">
+            <summary>Genera (o devuelve el ya existente de) el modelo 3D de una detección. Con Regenerar descarta el anterior.</summary>
+        </member>
+        <member name="M:DreamurDetector.Application.Interfaces.IModelo3DService.ObtenerPorDeteccionAsync(System.Guid,System.Threading.CancellationToken)">
+            <summary>Modelo vigente de la detección, o null si todavía no se generó.</summary>
+        </member>
+        <member name="T:DreamurDetector.Application.Options.GeneradorOptions">
+            <summary>Servicio Dreamur-Generate_Model (modelo 3D). Si BaseUrl está vacío, la función queda desactivada (503).</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Options.GeneradorOptions.BaseUrl">
+            <summary>URL del servicio, p. ej. https://dreamur-generate.onrender.com</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Options.GeneradorOptions.ApiKey">
+            <summary>Se envía en la cabecera X-API-Key; debe coincidir con DREAMUR_API_KEY del generador.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Options.GeneradorOptions.TimeoutSegundos">
+            <summary>Render gratis tarda en despertar: margen amplio.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Options.GeneradorOptions.MaxImagenMb">
+            <summary>El generador rechaza imágenes mayores (DREAMUR_MAX_IMAGEN_BYTES, 8 MB). Si la original pesa más, se genera sin ella.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Options.JwtOptions.Key">
+            <summary>Clave HMAC. Mínimo 32 caracteres. Se define por variable de entorno Jwt__Key.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Options.JwtOptions.ExpiraMinutos">
+            <summary>Duración del token de acceso. 240 min = 4 horas.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Options.AppOptions.FrontendUrl">
+            <summary>URL del frontend; se usa para armar los enlaces de los correos.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Options.AppOptions.PublicApiUrl">
+            <summary>URL pública de este backend (se envía al servicio ML como callback).</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Options.StorageOptions.Provider">
+            <summary>"Local" (desarrollo) o "S3" (Cloudflare R2, AWS S3, MinIO...).</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Options.DetectorOptions.ApiKey">
+            <summary>Clave que este backend envía al servicio ML (X-Api-Key).</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Options.DetectorOptions.CallbackApiKey">
+            <summary>Clave que el servicio ML debe enviar al callback de entrenamientos.</summary>
+        </member>
+        <member name="P:DreamurDetector.Application.Options.EmailOptions.BrevoApiKey">
+            <summary>API key v3 de Brevo (xkeysib-...). Si se define, los correos salen por la API HTTPS de Brevo.</summary>
+        </member>
+    </members>
+</doc>

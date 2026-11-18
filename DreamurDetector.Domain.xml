@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DreamurDetector.Domain</name>
+    </assembly>
+    <members>
+        <member name="F:DreamurDetector.Domain.Roles.Staff">
+            <summary>Lista separada por comas para [Authorize(Roles = ...)] (OR).</summary>
+        </member>
+        <member name="P:DreamurDetector.Domain.Entities.CorreoElectronico.UsuarioId">
+            <summary>Usuario dueño del correo (un usuario puede tener varios; un correo es de una sola persona).</summary>
+        </member>
+        <member name="T:DreamurDetector.Domain.Entities.TokenRevocado">
+            <summary>Tabla extra (db/002_extras.sql): JWT cerrados con logout antes de expirar.</summary>
+        </member>
+        <member name="P:DreamurDetector.Domain.Entities.Paciente.Codigo">
+            <summary>Lo genera la base de datos (PAC-000001).</summary>
+        </member>
+        <member name="P:DreamurDetector.Domain.Entities.ModeloVersion.Heads">
+            <summary>JSONB serializado, p. ej. {"tipo":["glioma","meningioma",...]}.</summary>
+        </member>
+        <member name="P:DreamurDetector.Domain.Entities.ModeloVersion.PesosXgb">
+            <summary>JSONB serializado.</summary>
+        </member>
+        <member name="P:DreamurDetector.Domain.Entities.ModeloVersion.Metricas">
+            <summary>JSONB serializado.</summary>
+        </member>
+        <member name="P:DreamurDetector.Domain.Entities.Deteccion.Probabilidades">
+            <summary>JSONB serializado.</summary>
+        </member>
+        <member name="P:DreamurDetector.Domain.Entities.Deteccion.ImagenValida">
+            <summary>false = la IA no reconoció una imagen cerebral válida (MRI/TC).</summary>
+        </member>
+        <member name="P:DreamurDetector.Domain.Entities.Auditoria.Detalle">
+            <summary>JSONB serializado.</summary>
+        </member>
+        <member name="T:DreamurDetector.Domain.Entities.MedicoPaciente">
+            <summary>Vínculo médico-paciente (tabla extra db/002_extras.sql).</summary>
+        </member>
+        <member name="T:DreamurDetector.Domain.Entities.Modelo3D">
+            <summary>
+            Modelo 3D (GLB) de una detección, generado por Dreamur-Generate_Model. Tabla modelos_3d (db/partes/20_modelos_3d.sql).
+            El archivo vive en el bucket; aquí solo queda su ruta. Es opcional: una detección puede no tener ninguno.
+            </summary>
+        </member>
+        <member name="P:DreamurDetector.Domain.Entities.Modelo3D.StorageKey">
+            <summary>modelos3d/{pacienteId}/{id}.glb</summary>
+        </member>
+        <member name="P:DreamurDetector.Domain.Entities.Modelo3D.NTriangulosTumor">
+            <summary>null si el modelo es solo del cerebro (sin tumor).</summary>
+        </member>
+        <member name="P:DreamurDetector.Domain.Entities.Modelo3D.Parametros">
+            <summary>JSONB serializado: corte detectado (plano, confianza, dudoso...), zona, semilla.</summary>
+        </member>
+        <member name="P:DreamurDetector.Domain.Entities.Modelo3D.DeletedAt">
+            <summary>Borrado lógico. Al regenerar, el modelo anterior queda con fecha aquí.</summary>
+        </member>
+    </members>
+</doc>

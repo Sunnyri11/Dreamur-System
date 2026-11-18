@@ -1,0 +1,246 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DreamurDetector.Api</name>
+    </assembly>
+    <members>
+        <member name="M:DreamurDetector.Api.Controllers.AuditoriaController.Listar(DreamurDetector.Application.Dtos.AuditoriaFiltro,System.Threading.CancellationToken)">
+            <summary>Registro de acciones sensibles (logins, subidas, detecciones, cambios de etiqueta...).</summary>
+        </member>
+        <member name="T:DreamurDetector.Api.Controllers.AuthController">
+            <summary>Registro, inicio/cierre de sesión (JWT de 4 horas), verificación de correo y recuperación de contraseña.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.AuthController.#ctor(DreamurDetector.Application.Interfaces.IAuthService)">
+            <summary>Registro, inicio/cierre de sesión (JWT de 4 horas), verificación de correo y recuperación de contraseña.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.AuthController.Registro(DreamurDetector.Application.Dtos.RegistroRequest,System.Threading.CancellationToken)">
+            <summary>Crea una cuenta de paciente.</summary>
+            <remarks>
+            Con confirmación de correo obligatoria (por defecto) responde 202: se envía un enlace por Brevo y la sesión
+            se abre al iniciar sesión después de confirmarlo. Si la confirmación está desactivada, responde 201 con la sesión.
+            </remarks>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.AuthController.Login(DreamurDetector.Application.Dtos.LoginRequest,System.Threading.CancellationToken)">
+            <summary>Inicia sesión. Devuelve un JWT válido por 4 horas.</summary>
+            <remarks>Tras 5 intentos fallidos la cuenta se bloquea 15 minutos.</remarks>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.AuthController.Logout(System.Threading.CancellationToken)">
+            <summary>Cierra la sesión: el token actual deja de ser válido de inmediato.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.AuthController.CambiarRol(DreamurDetector.Application.Dtos.CambiarRolRequest,System.Threading.CancellationToken)">
+            <summary>Cambia el rol activo (paciente | medico | admin) entre los perfiles que tiene la cuenta.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.AuthController.ActivarRol(DreamurDetector.Application.Dtos.ActivarRolRequest,System.Threading.CancellationToken)">
+            <summary>Activa un perfil adicional: paciente (médicos/admin) o médico (admin). Devuelve la sesión con el rol nuevo.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.AuthController.Me(System.Threading.CancellationToken)">
+            <summary>Datos del usuario autenticado.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.AuthController.CambiarPassword(DreamurDetector.Application.Dtos.CambiarPasswordRequest,System.Threading.CancellationToken)">
+            <summary>Cambia la contraseña y cierra la sesión actual.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.AuthController.OlvidePassword(DreamurDetector.Application.Dtos.OlvidePasswordRequest,System.Threading.CancellationToken)">
+            <summary>Envía un enlace de restablecimiento. Responde igual exista o no la cuenta.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.AuthController.RestablecerPassword(DreamurDetector.Application.Dtos.RestablecerPasswordRequest,System.Threading.CancellationToken)">
+            <summary>Define una nueva contraseña usando el token recibido por correo.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.AuthController.VerificarCorreo(DreamurDetector.Application.Dtos.VerificarCorreoRequest,System.Threading.CancellationToken)">
+            <summary>Confirma el correo con el token recibido por email.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.AuthController.ReenviarVerificacionPublico(DreamurDetector.Application.Dtos.ReenviarVerificacionRequest,System.Threading.CancellationToken)">
+            <summary>Reenvía el correo de confirmación sin necesidad de sesión. Responde igual exista o no la cuenta.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.AuthController.ReenviarVerificacion(System.Threading.CancellationToken)">
+            <summary>Reenvía el correo de verificación al usuario autenticado.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.CatalogoController.TiposTumor(System.Threading.CancellationToken)">
+            <summary>Tipos de tumor aplicables a cerebro (incluye «sin_tumor»).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.DeteccionesController.Analizar(System.Guid,System.Threading.CancellationToken)">
+            <summary>Analiza la radiografía con el modelo activo y guarda el resultado (tipo, confianza, zonas).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.DeteccionesController.Historial(System.Guid,System.Threading.CancellationToken)">
+            <summary>Historial de detecciones de una radiografía (más reciente primero).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.DeteccionesController.Obtener(System.Guid,System.Threading.CancellationToken)">
+            <summary>Detalle de una detección.</summary>
+        </member>
+        <member name="T:DreamurDetector.Api.Controllers.EtiquetasController">
+            <summary>Diagnóstico confirmado por un médico. Es lo único que alimenta el reentrenamiento.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.EtiquetasController.#ctor(DreamurDetector.Application.Interfaces.IEtiquetaService)">
+            <summary>Diagnóstico confirmado por un médico. Es lo único que alimenta el reentrenamiento.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.EtiquetasController.Guardar(System.Guid,DreamurDetector.Application.Dtos.EtiquetaRequest,System.Threading.CancellationToken)">
+            <summary>Crea o reemplaza la etiqueta (médico/admin). Marca la radiografía como revisada.</summary>
+        </member>
+        <member name="T:DreamurDetector.Api.Controllers.MedicosController">
+            <summary>Listado de médicos (solo administrador). El alta se hace con POST /api/usuarios (rol «medico»).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.MedicosController.#ctor(DreamurDetector.Application.Interfaces.IMedicoService)">
+            <summary>Listado de médicos (solo administrador). El alta se hace con POST /api/usuarios (rol «medico»).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.MedicosController.Listar(DreamurDetector.Application.Dtos.MedicoFiltro,System.Threading.CancellationToken)">
+            <summary>Lista médicos con su estado, último acceso y número de pacientes vinculados.</summary>
+        </member>
+        <member name="T:DreamurDetector.Api.Controllers.Modelos3DController">
+            <summary>Modelo 3D opcional de una detección (cerebro + zona del tumor). Mismas reglas de acceso que las radiografías.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.Modelos3DController.#ctor(DreamurDetector.Application.Interfaces.IModelo3DService)">
+            <summary>Modelo 3D opcional de una detección (cerebro + zona del tumor). Mismas reglas de acceso que las radiografías.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.Modelos3DController.Generar(System.Guid,DreamurDetector.Application.Dtos.GenerarModelo3DRequest,System.Threading.CancellationToken)">
+            <summary>
+            Genera el modelo 3D con la imagen y las zonas de la detección. Si ya existe uno lo devuelve;
+            con <c>regenerar: true</c> lo reemplaza (p. ej. tras corregir el plano). El cuerpo es opcional.
+            </summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.Modelos3DController.Obtener(System.Guid,System.Threading.CancellationToken)">
+            <summary>Modelo 3D vigente de la detección. 204 si todavía no se generó.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.Modelos3DController.Archivo(System.Guid,System.Threading.CancellationToken)">
+            <summary>Descarga el archivo .glb (para el visor 3D o para guardarlo).</summary>
+        </member>
+        <member name="T:DreamurDetector.Api.Controllers.ModelosController">
+            <summary>Versiones del modelo y entrenamientos de Dreamur-Detector (región cerebro).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.ModelosController.#ctor(DreamurDetector.Application.Interfaces.IModeloService)">
+            <summary>Versiones del modelo y entrenamientos de Dreamur-Detector (región cerebro).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.ModelosController.Activar(System.Int32,System.Threading.CancellationToken)">
+            <summary>Activa una versión (sirve también para volver a una versión anterior).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.ModelosController.IniciarEntrenamiento(System.Threading.CancellationToken)">
+            <summary>Dispara un reentrenamiento con las etiquetas disponibles (dataset + pacientes con consentimiento).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.ModelosController.Completar(System.Int32,DreamurDetector.Application.Dtos.CompletarEntrenamientoRequest,System.String,System.Threading.CancellationToken)">
+            <summary>Callback del servicio ML al terminar. Se autentica con la cabecera X-Api-Key (no con JWT).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.PacientesController.Listar(DreamurDetector.Application.Dtos.PacienteFiltro,System.Threading.CancellationToken)">
+            <summary>Lista pacientes. Médico: solo los vinculados a él. Admin: todos. Busca por nombre, código o documento.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.PacientesController.Crear(DreamurDetector.Application.Dtos.CrearPacienteMedicoRequest,System.Threading.CancellationToken)">
+            <summary>El médico da de alta a un paciente nuevo; queda vinculado solo a ese médico.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.PacientesController.Vincular(DreamurDetector.Application.Dtos.VincularPacienteRequest,System.Threading.CancellationToken)">
+            <summary>El médico vincula un paciente ya registrado con su código PAC-xxxxxx o su documento.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.PacientesController.Desvincular(System.Guid,System.Threading.CancellationToken)">
+            <summary>Quita al paciente de la lista del médico (no borra al paciente ni sus datos).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.PacientesController.Mi(System.Threading.CancellationToken)">
+            <summary>Ficha del paciente autenticado.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.PacientesController.Obtener(System.Guid,System.Threading.CancellationToken)">
+            <summary>Ficha de un paciente (él mismo, su médico vinculado o un administrador).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.PacientesController.Actualizar(System.Guid,DreamurDetector.Application.Dtos.ActualizarPacienteRequest,System.Threading.CancellationToken)">
+            <summary>Actualiza datos personales y clínicos (paciente o su médico vinculado; el admin no edita a terceros).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.PacientesController.Evolucion(System.Guid,System.Threading.CancellationToken)">
+            <summary>Evolución del paciente: resultado de la última detección de cada imagen, ordenado en el tiempo.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.PacientesController.Consentimientos(System.Guid,System.Threading.CancellationToken)">
+            <summary>Historial de consentimientos del paciente.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.PacientesController.RegistrarConsentimiento(DreamurDetector.Application.Dtos.ConsentimientoRequest,System.Threading.CancellationToken)">
+            <summary>Registra un cambio de consentimiento (cada cambio es una fila nueva; vale el último).</summary>
+        </member>
+        <member name="T:DreamurDetector.Api.Controllers.PerfilController">
+            <summary>Perfil del usuario autenticado (paciente, médico o administrador): ver y editar sus propios datos.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.PerfilController.#ctor(DreamurDetector.Application.Interfaces.IPerfilService)">
+            <summary>Perfil del usuario autenticado (paciente, médico o administrador): ver y editar sus propios datos.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.PerfilController.Obtener(System.Threading.CancellationToken)">
+            <summary>Todos mis datos personales (y los propios de mi rol: clínicos, matrícula, nivel admin...).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.PerfilController.Actualizar(DreamurDetector.Application.Dtos.ActualizarPerfilRequest,System.Threading.CancellationToken)">
+            <summary>Actualiza mis datos. null = no cambia; cadena vacía = borrar el valor (campos opcionales).</summary>
+        </member>
+        <member name="T:DreamurDetector.Api.Controllers.RadiografiasController">
+            <summary>Imágenes de cerebro (MRI / TC). Los pacientes solo ven las suyas.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.RadiografiasController.#ctor(DreamurDetector.Application.Interfaces.IRadiografiaService)">
+            <summary>Imágenes de cerebro (MRI / TC). Los pacientes solo ven las suyas.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.RadiografiasController.Subir(DreamurDetector.Api.Models.SubirRadiografiaForm,System.Threading.CancellationToken)">
+            <summary>Sube una imagen (multipart/form-data). Máx. 20 MB; JPEG, PNG o WEBP.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.RadiografiasController.Listar(DreamurDetector.Application.Dtos.RadiografiaFiltro,System.Threading.CancellationToken)">
+            <summary>Lista radiografías con filtros y paginación.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.RadiografiasController.Obtener(System.Guid,System.Threading.CancellationToken)">
+            <summary>Detalle de una radiografía (con etiqueta y última detección).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.RadiografiasController.Archivo(System.Guid,System.Threading.CancellationToken)">
+            <summary>Descarga/visualiza la imagen original.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.RadiografiasController.Eliminar(System.Guid,System.Threading.CancellationToken)">
+            <summary>Borrado lógico. El paciente borra solo lo que subió; el admin cualquiera.</summary>
+        </member>
+        <member name="T:DreamurDetector.Api.Controllers.UsuariosController">
+            <summary>Administración de cuentas (solo admin): alta de médicos/administradores, activar/desactivar, desbloquear.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.UsuariosController.#ctor(DreamurDetector.Application.Interfaces.IUsuarioService)">
+            <summary>Administración de cuentas (solo admin): alta de médicos/administradores, activar/desactivar, desbloquear.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Controllers.UsuariosController.Crear(DreamurDetector.Application.Dtos.CrearUsuarioRequest,System.Threading.CancellationToken)">
+            <summary>Crea una cuenta de médico o administrador (los pacientes se registran solos).</summary>
+        </member>
+        <member name="T:DreamurDetector.Api.Middleware.CorrelationIdMiddleware">
+            <summary>Propaga/crea X-Correlation-Id y lo incluye en cada línea de log de la petición.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Middleware.CorrelationIdMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.Extensions.Logging.ILogger{DreamurDetector.Api.Middleware.CorrelationIdMiddleware})">
+            <summary>Propaga/crea X-Correlation-Id y lo incluye en cada línea de log de la petición.</summary>
+        </member>
+        <member name="T:DreamurDetector.Api.Middleware.ExceptionHandlingMiddleware">
+            <summary>Convierte excepciones de aplicación en respuestas HTTP coherentes; oculta detalles internos en producción.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Middleware.ExceptionHandlingMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.Extensions.Logging.ILogger{DreamurDetector.Api.Middleware.ExceptionHandlingMiddleware},Microsoft.Extensions.Hosting.IHostEnvironment)">
+            <summary>Convierte excepciones de aplicación en respuestas HTTP coherentes; oculta detalles internos en producción.</summary>
+        </member>
+        <member name="T:DreamurDetector.Api.Middleware.ProblemWriter">
+            <summary>Escribe errores como application/problem+json (RFC 9457) de forma uniforme.</summary>
+        </member>
+        <member name="T:DreamurDetector.Api.Middleware.SecurityHeadersMiddleware">
+            <summary>Cabeceras de seguridad básicas. Datos médicos: las respuestas de /api nunca se cachean.</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Middleware.SecurityHeadersMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>Cabeceras de seguridad básicas. Datos médicos: las respuestas de /api nunca se cachean.</summary>
+        </member>
+        <member name="T:DreamurDetector.Api.Models.SubirRadiografiaForm">
+            <summary>Formulario multipart/form-data para subir una imagen de cerebro (MRI o TC).</summary>
+        </member>
+        <member name="P:DreamurDetector.Api.Models.SubirRadiografiaForm.Archivo">
+            <summary>Imagen JPEG, PNG o WEBP.</summary>
+        </member>
+        <member name="P:DreamurDetector.Api.Models.SubirRadiografiaForm.Modalidad">
+            <summary>mri | tc</summary>
+        </member>
+        <member name="P:DreamurDetector.Api.Models.SubirRadiografiaForm.PacienteId">
+            <summary>Solo personal médico/admin: paciente al que pertenece la imagen.</summary>
+        </member>
+        <member name="P:DreamurDetector.Api.Models.SubirRadiografiaForm.EsDataset">
+            <summary>Solo admin: cargar al dataset inicial (sin paciente).</summary>
+        </member>
+        <member name="P:DreamurDetector.Api.Models.SubirRadiografiaForm.TipoTumorDataset">
+            <summary>Solo dataset: tipo de tumor para la etiqueta inicial (glioma, meningioma...).</summary>
+        </member>
+        <member name="T:DreamurDetector.Api.Security.CurrentUser">
+            <summary>Usuario actual leído de los claims del JWT (sub, persona_id, role, jti, exp).</summary>
+        </member>
+        <member name="M:DreamurDetector.Api.Security.CurrentUser.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor)">
+            <summary>Usuario actual leído de los claims del JWT (sub, persona_id, role, jti, exp).</summary>
+        </member>
+        <member name="T:DreamurDetector.Api.Security.ServiceApiKeyAttribute">
+            <summary>Autentica llamadas servidor-a-servidor (el servicio ML) con la cabecera X-Api-Key = Detector:CallbackApiKey.</summary>
+        </member>
+        <member name="T:Program">
+            <summary>
+            Auto-generated public partial Program class for top-level statement apps.
+            </summary>
+        </member>
+    </members>
+</doc>

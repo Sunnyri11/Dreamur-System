@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DreamurDetector.Infrastructure</name>
+    </assembly>
+    <members>
+        <member name="T:DreamurDetector.Infrastructure.Email.BrevoEmailSender">
+            <summary>
+            Envía correos por la API HTTPS de Brevo (POST /v3/smtp/email).
+            Se usa la API y no el relé SMTP porque los planes gratuitos de Render bloquean los puertos SMTP salientes.
+            Requisito en Brevo: el remitente (Email__Remitente) debe estar verificado en Senders &amp; IP.
+            </summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Email.BrevoEmailSender.#ctor(System.Net.Http.HttpClient,Microsoft.Extensions.Options.IOptions{DreamurDetector.Application.Options.EmailOptions},Microsoft.Extensions.Logging.ILogger{DreamurDetector.Infrastructure.Email.BrevoEmailSender})">
+            <summary>
+            Envía correos por la API HTTPS de Brevo (POST /v3/smtp/email).
+            Se usa la API y no el relé SMTP porque los planes gratuitos de Render bloquean los puertos SMTP salientes.
+            Requisito en Brevo: el remitente (Email__Remitente) debe estar verificado en Senders &amp; IP.
+            </summary>
+        </member>
+        <member name="T:DreamurDetector.Infrastructure.Email.LogEmailSender">
+            <summary>Se usa cuando no hay SMTP configurado: escribe el correo en el log (útil en desarrollo).</summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Email.LogEmailSender.#ctor(Microsoft.Extensions.Logging.ILogger{DreamurDetector.Infrastructure.Email.LogEmailSender})">
+            <summary>Se usa cuando no hay SMTP configurado: escribe el correo en el log (útil en desarrollo).</summary>
+        </member>
+        <member name="T:DreamurDetector.Infrastructure.External.DetectorClient">
+            <summary>
+            Cliente HTTP del servicio ML de Dreamur-Detector.
+            Contrato asumido (ajústalo aquí si tu servicio difiere):
+              POST {BaseUrl}/predict  multipart: file (imagen), region ("cerebro")
+                -> { "imagen_valida": true, "tipo_imagen": "resonancia_cerebral", "mensaje": null,
+                     "tipo_tumor": "glioma", "confianza": 0.93, "probabilidades": { "glioma": 0.93, ... },
+                     "zonas": [ { "x": .., "y": .., "ancho": .., "alto": .., "puntaje": .. } ], "modelo_version": 3 }
+              POST {BaseUrl}/train    json: { "entrenamiento_id": 1, "region": "cerebro", "callback_url": "..." }
+            Coordenadas de zonas normalizadas 0..1. Cabecera X-Api-Key si Detector:ApiKey está definida.
+            </summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.External.DetectorClient.#ctor(System.Net.Http.HttpClient,Microsoft.Extensions.Options.IOptions{DreamurDetector.Application.Options.AppOptions},Microsoft.Extensions.Logging.ILogger{DreamurDetector.Infrastructure.External.DetectorClient})">
+            <summary>
+            Cliente HTTP del servicio ML de Dreamur-Detector.
+            Contrato asumido (ajústalo aquí si tu servicio difiere):
+              POST {BaseUrl}/predict  multipart: file (imagen), region ("cerebro")
+                -> { "imagen_valida": true, "tipo_imagen": "resonancia_cerebral", "mensaje": null,
+                     "tipo_tumor": "glioma", "confianza": 0.93, "probabilidades": { "glioma": 0.93, ... },
+                     "zonas": [ { "x": .., "y": .., "ancho": .., "alto": .., "puntaje": .. } ], "modelo_version": 3 }
+              POST {BaseUrl}/train    json: { "entrenamiento_id": 1, "region": "cerebro", "callback_url": "..." }
+            Coordenadas de zonas normalizadas 0..1. Cabecera X-Api-Key si Detector:ApiKey está definida.
+            </summary>
+        </member>
+        <member name="T:DreamurDetector.Infrastructure.External.GeneradorClient">
+            <summary>
+            Cliente HTTP de Dreamur-Generate_Model.
+              POST {BaseUrl}/generar  json: { tipo_tumor, zonas:[{x,y,ancho,alto,puntaje}], plano, calidad, vasos, imagen_base64 }
+                -> { glb_base64, sha256, tam_bytes, n_triangulos_cerebro, n_triangulos_tumor, tipo_tumor, version_generador, parametros }
+            Cabecera X-API-Key si Generador:ApiKey está definida. El servicio no guarda estado: aquí se sube el GLB al bucket.
+            </summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.External.GeneradorClient.#ctor(System.Net.Http.HttpClient,Microsoft.Extensions.Options.IOptions{DreamurDetector.Application.Options.GeneradorOptions},Microsoft.Extensions.Logging.ILogger{DreamurDetector.Infrastructure.External.GeneradorClient})">
+            <summary>
+            Cliente HTTP de Dreamur-Generate_Model.
+              POST {BaseUrl}/generar  json: { tipo_tumor, zonas:[{x,y,ancho,alto,puntaje}], plano, calidad, vasos, imagen_base64 }
+                -> { glb_base64, sha256, tam_bytes, n_triangulos_cerebro, n_triangulos_tumor, tipo_tumor, version_generador, parametros }
+            Cabecera X-API-Key si Generador:ApiKey está definida. El servicio no guarda estado: aquí se sube el GLB al bucket.
+            </summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Persistence.ConnectionStringHelper.Resolve(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Resuelve la conexión a Neon. Orden: variable DATABASE_URL, luego ConnectionStrings:Default.
+            Acepta formato URI (postgresql://user:pass@host/db?sslmode=require, el que muestra Neon)
+            o formato Npgsql (Host=...;Database=...).
+            </summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Persistence.DbInitializer.InicializarBaseDeDatosAsync(System.IServiceProvider,System.Threading.CancellationToken)">
+            <summary>
+            Al arrancar: aplica db/actualizar_tablas.sql (solo CREATE/ADD ... IF NOT EXISTS: no borra ni reemplaza datos,
+            así que el entrenamiento de Dreamur-Detector se conserva) y crea el administrador inicial si no existe ninguno.
+            </summary>
+        </member>
+        <member name="T:DreamurDetector.Infrastructure.Security.JwtTokenService">
+            <summary>Emite JWT HS256. Claims: sub, jti, persona_id, role, email, name. Duración: Jwt:ExpiraMinutos (240 = 4 h).</summary>
+        </member>
+        <member name="T:DreamurDetector.Infrastructure.Security.Pbkdf2PasswordHasher">
+            <summary>PBKDF2-HMAC-SHA512 (recomendación OWASP), sin dependencias externas. Formato: pbkdf2-sha512$iter$salt$hash.</summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Services.AuthService.RolesDisponiblesAsync(DreamurDetector.Domain.Entities.Usuario,System.Threading.CancellationToken)">
+            <summary>Perfiles que existen de verdad (tablas pacientes/medicos/administradores), del más alto al más bajo.</summary>
+        </member>
+        <member name="T:DreamurDetector.Infrastructure.Services.EtiquetaService">
+            <summary>Diagnóstico confirmado: es lo único que alimenta el reentrenamiento del modelo.</summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Services.EtiquetaService.#ctor(DreamurDetector.Infrastructure.Persistence.AppDbContext,DreamurDetector.Application.Common.ICurrentUser,DreamurDetector.Application.Interfaces.IAuditoriaService)">
+            <summary>Diagnóstico confirmado: es lo único que alimenta el reentrenamiento del modelo.</summary>
+        </member>
+        <member name="T:DreamurDetector.Infrastructure.Services.EvolucionService">
+            <summary>Serie temporal de resultados de un paciente (una fila por radiografía, con su última detección).</summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Services.EvolucionService.#ctor(DreamurDetector.Infrastructure.Persistence.AppDbContext,DreamurDetector.Application.Common.ICurrentUser)">
+            <summary>Serie temporal de resultados de un paciente (una fila por radiografía, con su última detección).</summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Services.JsonHelper.LeerTipos(System.String)">
+            <summary>Extrae heads.tipo (lista de clases) del JSONB de modelo_versiones.heads.</summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Services.DbExtensions.PatronILike(System.String)">
+            <summary>Escapa % y _ para usarlos dentro de un patrón ILIKE.</summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Services.DbExtensions.PuedeAccederPacienteAsync(DreamurDetector.Infrastructure.Persistence.AppDbContext,DreamurDetector.Application.Common.ICurrentUser,System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Reglas de acceso a los datos de un paciente: el paciente solo a lo suyo; el médico solo a los pacientes
+            vinculados en medico_pacientes; el administrador puede verlo todo (solo lectura en la práctica).
+            </summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Services.DbExtensions.ValidarAccesoAsync(DreamurDetector.Infrastructure.Persistence.AppDbContext,DreamurDetector.Application.Common.ICurrentUser,DreamurDetector.Domain.Entities.Radiografia,System.Threading.CancellationToken)">
+            <summary>Valida que el usuario actual pueda ver la radiografía. Si no, responde 404 para no revelar su existencia.</summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Services.DbExtensions.RadiografiaAccesibleAsync(DreamurDetector.Infrastructure.Persistence.AppDbContext,DreamurDetector.Application.Common.ICurrentUser,System.Guid,System.Threading.CancellationToken,System.Boolean)">
+            <summary>Carga una radiografía activa y valida que el usuario actual pueda verla.</summary>
+        </member>
+        <member name="T:DreamurDetector.Infrastructure.Services.MedicoService">
+            <summary>Listado de médicos para el administrador. (El alta y activar/desactivar van por IUsuarioService.)</summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Services.MedicoService.#ctor(DreamurDetector.Infrastructure.Persistence.AppDbContext)">
+            <summary>Listado de médicos para el administrador. (El alta y activar/desactivar van por IUsuarioService.)</summary>
+        </member>
+        <member name="T:DreamurDetector.Infrastructure.Services.Modelo3DService">
+            <summary>
+            Modelo 3D opcional de una detección. Usa la imagen original y las zonas que dejó Dreamur-Detector
+            (detecciones_zonas): la "zona dibujada" que ve el usuario es esa misma, no una imagen guardada aparte.
+            Flujo: validar acceso -> llamar al generador -> subir el GLB al bucket -> registrar la fila en modelos_3d.
+            </summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Services.Modelo3DService.#ctor(DreamurDetector.Infrastructure.Persistence.AppDbContext,DreamurDetector.Application.Interfaces.IStorageService,DreamurDetector.Application.Interfaces.IGeneradorClient,DreamurDetector.Application.Common.ICurrentUser,DreamurDetector.Application.Interfaces.IAuditoriaService,Microsoft.Extensions.Options.IOptions{DreamurDetector.Application.Options.GeneradorOptions},Microsoft.Extensions.Logging.ILogger{DreamurDetector.Infrastructure.Services.Modelo3DService})">
+            <summary>
+            Modelo 3D opcional de una detección. Usa la imagen original y las zonas que dejó Dreamur-Detector
+            (detecciones_zonas): la "zona dibujada" que ve el usuario es esa misma, no una imagen guardada aparte.
+            Flujo: validar acceso -> llamar al generador -> subir el GLB al bucket -> registrar la fila en modelos_3d.
+            </summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Services.Modelo3DService.LeerImagenAsync(DreamurDetector.Domain.Entities.RadiografiaArchivo,System.Threading.CancellationToken)">
+            <summary>Imagen original en memoria, o null si no cabe en el límite del generador (se genera sin ella).</summary>
+        </member>
+        <member name="T:DreamurDetector.Infrastructure.Services.PerfilService">
+            <summary>Perfil del propio usuario autenticado (paciente, médico o administrador): ver y editar sus datos.</summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Services.PerfilService.#ctor(DreamurDetector.Infrastructure.Persistence.AppDbContext,DreamurDetector.Application.Common.ICurrentUser,DreamurDetector.Application.Interfaces.IAuditoriaService)">
+            <summary>Perfil del propio usuario autenticado (paciente, médico o administrador): ver y editar sus datos.</summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Services.RadiografiaService.DetectarImagen(System.Byte[])">
+            <summary>Valida la imagen por sus "magic bytes" (no confía en la extensión ni en el Content-Type).</summary>
+        </member>
+        <member name="T:DreamurDetector.Infrastructure.Storage.LocalStorageService">
+            <summary>Almacenamiento en disco. Solo para desarrollo: el disco de Render es efímero.</summary>
+        </member>
+        <member name="M:DreamurDetector.Infrastructure.Storage.LocalStorageService.#ctor(Microsoft.Extensions.Options.IOptions{DreamurDetector.Application.Options.StorageOptions})">
+            <summary>Almacenamiento en disco. Solo para desarrollo: el disco de Render es efímero.</summary>
+        </member>
+        <member name="T:DreamurDetector.Infrastructure.Storage.S3StorageService">
+            <summary>Bucket compatible con S3: Cloudflare R2, AWS S3, MinIO, Backblaze B2...</summary>
+        </member>
+    </members>
+</doc>
